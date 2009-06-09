@@ -216,10 +216,10 @@ namespace LaTeXBibitemsStyler
         /// </summary>
         private void WriteBibFile()
         {
+            StreamWriter sw = new StreamWriter(filePath + outputBibFile, false, Encoding.UTF8);
+
             try
             {
-                StreamWriter sw = new StreamWriter(filePath + outputBibFile, false, Encoding.UTF8);
-
                 //write document's preamble
                 sw.Write(preamble + "\n\n");
 
@@ -251,8 +251,11 @@ namespace LaTeXBibitemsStyler
                     //write \bibitem in the order of appearance of cites 
                     for (int i = 0; i < aCites.Count; i++)
                     {
-                        sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + hBibitems[aCites[i].ToString()].ToString() + "\n\n");
-                        hBibitems.Remove(aCites[i].ToString());
+                        if (hBibitems.Contains(aCites[i].ToString()))
+                        {
+                            sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + hBibitems[aCites[i].ToString()].ToString() + "\n\n");
+                            hBibitems.Remove(aCites[i].ToString());
+                        }
                     }
 
                     //when we've written all the cited \bibitems, there might still be some \bibitems to write (these
@@ -270,7 +273,11 @@ namespace LaTeXBibitemsStyler
                 lblResult.Text = "Yay! Made it!";
                 lblResult.ForeColor = System.Drawing.Color.Green;
             }
-            catch { }
+            catch 
+            {
+                sw.Write("\n" + postamble);
+                sw.Close();
+            }
         }
     }
 }
