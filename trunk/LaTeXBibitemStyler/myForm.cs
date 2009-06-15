@@ -216,7 +216,7 @@ namespace LaTeXBibitemsStyler
         /// </summary>
         private void WriteBibFile()
         {
-            StreamWriter sw = new StreamWriter(filePath + outputBibFile, false, Encoding.UTF8);
+            StreamWriter sw = new StreamWriter(filePath + outputBibFile, false, Encoding.Default);
 
             try
             {
