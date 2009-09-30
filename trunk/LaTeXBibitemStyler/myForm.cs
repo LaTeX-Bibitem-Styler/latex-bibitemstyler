@@ -11,7 +11,7 @@ using System.Collections;
 /************************************************************************
  * Version 2.0 - Revised by suggestion of Olli Nummi                    *
  ************************************************************************
- * v2-01: replace '~\\cite' by '\\cite'                                 *
+ * v2-01: replace '~\cite' by '\cite' in the search for cites			*
  * v2-02: use '\include' as well as '\input' to search for tex files    *
  * v2-03: search for cites in the main tex file too                     *
  * v2-04: handle multiple keys inside single citation                   *
@@ -122,17 +122,22 @@ namespace LaTeXBibitemsStyler
                 //search for beginning of document
                 while (sr.ReadLine() != "\\begin{document}") ;
 
-                //parse document looking for \input or \include tags, and we'll store the enclosed tex file names in an arraylist
+                //parse document looking for \input or \include tags, and we'll store the enclosed tex file names in an arraylist //v2-02
                 while (sr.Peek() >= 0)
                 {
                     string l = sr.ReadLine();
-                    if (l.Contains("\\input{") || l.Contains("\\include{")) //v2-02
+                    string temp = "";
+                    if (l.Contains("\\input{") || l.Contains("\\include{")) //v2-02 
                     {
-                        int i = l.IndexOf('{') + 1;
-                        int c = l.IndexOf('}') - i;
-                        string texFile = l.Substring(i, c);
-                        if (texFile != bibFilename) aTexFiles.Add(texFile);
-                    }
+                    	if (l.Contains("\\input{")) temp = "\\input{"; 
+                    	if (l.Contains("\\include{")) temp = "\\include{";
+                    
+	                    int i = l.IndexOf(temp) + 1;
+	                    int c = l.IndexOf(temp) - i;
+	                    //get file name from command
+	                    string texFile = l.Substring(i, c);
+	                    if (texFile != bibFilename) aTexFiles.Add(texFile);
+	                }
                 }
                 sr.Close();
             }
