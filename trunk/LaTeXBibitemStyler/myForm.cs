@@ -8,6 +8,15 @@ using System.Windows.Forms;
 using System.IO;
 using System.Collections;
 
+/************************************************************************
+ * Version 2.0 - Revised by suggestion of Olli Nummi                    *
+ ************************************************************************
+ * v2-01: replace '~\\cite' by '\\cite'                                 *
+ * v2-02: use '\include' as well as '\input' to search for tex files    *
+ * v2-03: search for cites in the main tex file too                     *
+ * v2-04: handle multiple keys inside single citation                   *
+ ************************************************************************/
+
 namespace LaTeXBibitemsStyler
 {
     public partial class myForm : Form
@@ -75,6 +84,7 @@ namespace LaTeXBibitemsStyler
 
                         GetInputFiles();
                         GetFilePath();
+                        GetMainTexFileCites();
                         GetTexFileCites();
                         GetBibitems();
                         WriteBibFile();
@@ -112,11 +122,11 @@ namespace LaTeXBibitemsStyler
                 //search for beginning of document
                 while (sr.ReadLine() != "\\begin{document}") ;
 
-                //parse document looking for \input tags, and we'll store the enclosed tex file names in an arraylist
+                //parse document looking for \input or \include tags, and we'll store the enclosed tex file names in an arraylist
                 while (sr.Peek() >= 0)
                 {
                     string l = sr.ReadLine();
-                    if (l.Contains("\\input{"))
+                    if (l.Contains("\\input{") || l.Contains("\\include{")) //v2-02
                     {
                         int i = l.IndexOf('{') + 1;
                         int c = l.IndexOf('}') - i;
@@ -138,6 +148,38 @@ namespace LaTeXBibitemsStyler
         }
 
         /// <summary>
+        /// search for cites in the project's main tex file  //v2-03
+        /// </summary>
+        private void GetMainTexFileCites() //v2-03
+        {
+            StreamReader sr;
+            aCites = new ArrayList();
+
+            try
+            {
+                sr = new StreamReader(filePath + mainTexFile);
+                string s = sr.ReadToEnd();
+                //parse the document looking for \cite tags, we'll store the contents in an arraylist so
+                //the global order of appearance is kept, and no repetition is allowed
+                while (s.IndexOf("\\cite{") != -1) //v2-01
+                {
+                    s = s.Substring(s.IndexOf("\\cite{") + 6); //v2-01
+                    string temp = s.Substring(0, s.IndexOf('}'));
+                    //v2-04: handle multiple keys inside single citation
+                    string[] cites = temp.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach(string c in cites)
+                    {
+                        string cite = c.TrimEnd().TrimStart(); //clear leading and trailing whitespaces
+                        if (!aCites.Contains(cite)) //check if the cite key is already there, to avoid duplicating keys
+                            aCites.Add(cite);
+                    }
+                }
+                sr.Close();
+            }
+            catch { }
+        }
+
+        /// <summary>
         /// read all the project's tex files and get the contents of all \cite tags, with no repetition
         /// </summary>
         private void GetTexFileCites()
@@ -145,22 +187,29 @@ namespace LaTeXBibitemsStyler
             try
             {
                 StreamReader sr;
-                aCites = new ArrayList();
+                //aCites = new ArrayList(); //v2-03
 
                 //read through all tex files looking for \cite tags
                 foreach (string texFile in aTexFiles)
                 {
-                    sr = new StreamReader(filePath + texFile);
-                    string s = sr.ReadToEnd();
-                    //parse the document looking for \cite tags, we'll store the contents in an arraylist so
-                    //the global order of appearance is kept, and no repetition is allowed
-                    while (s.IndexOf("~\\cite{") != -1)
+                     sr = new StreamReader(filePath + mainTexFile);
+                string s = sr.ReadToEnd();
+                //parse the document looking for \cite tags, we'll store the contents in an arraylist so
+                //the global order of appearance is kept, and no repetition is allowed
+                while (s.IndexOf("\\cite{") != -1) //v2-01
+                {
+                    s = s.Substring(s.IndexOf("\\cite{") + 6); //v2-01
+                    string temp = s.Substring(0, s.IndexOf('}'));
+                    //v2-04: handle multiple keys inside single citation
+                    string[] cites = temp.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach(string c in cites)
                     {
-                        s = s.Substring(s.IndexOf("~\\cite{") + 7);
-                        string cite = s.Substring(0, s.IndexOf('}'));
-                        if (!aCites.Contains(cite)) aCites.Add(cite); //así evitamos duplicados
+                        string cite = c.TrimEnd().TrimStart(); //clear leading and trailing whitespaces
+                        if (!aCites.Contains(cite)) //check if the cite key is already there, to avoid duplicating keys
+                            aCites.Add(cite);
                     }
-                    sr.Close();
+                }
+                sr.Close();
                 }
             }
             catch { }
