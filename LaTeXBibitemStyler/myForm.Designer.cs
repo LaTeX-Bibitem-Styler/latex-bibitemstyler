@@ -215,7 +215,7 @@ namespace LaTeXBibitemsStyler
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "myForm";
-            this.Text = "LaTeX Bibitem Styler by PchiwaN 2009";
+            this.Text = "LaTeX Bibitem Styler by PchiwaN 2013";
             this.Load += new System.EventHandler(this.myForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

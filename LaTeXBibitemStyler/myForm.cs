@@ -9,6 +9,13 @@ using System.IO;
 using System.Collections;
 
 /************************************************************************
+ * Version 3.0 - Revised by suggestion of Günther Lientschnig           *
+ ************************************************************************
+ * v3-01: revise PLAIN and UNSRT generation methods, they were not   	*
+ *   working propery!                                                   *
+ ************************************************************************/
+
+/************************************************************************
  * Version 2.0 - Revised by suggestion of Olli Nummi                    *
  ************************************************************************
  * v2-01: replace '~\cite' by '\cite' in the search for cites			*
@@ -129,11 +136,8 @@ namespace LaTeXBibitemsStyler
                     string temp = "";
                     if (l.Contains("\\input{") || l.Contains("\\include{")) //v2-02 
                     {
-                    	if (l.Contains("\\input{")) temp = "\\input{"; 
-                    	if (l.Contains("\\include{")) temp = "\\include{";
-                    
-	                    int i = l.IndexOf(temp) + 1;
-	                    int c = l.IndexOf(temp) - i;
+	                    int i = l.IndexOf("{") + 1;
+	                    int c = l.IndexOf("}") - i;
 	                    //get file name from command
 	                    string texFile = l.Substring(i, c);
 	                    if (texFile != bibFilename) aTexFiles.Add(texFile);
@@ -197,24 +201,24 @@ namespace LaTeXBibitemsStyler
                 //read through all tex files looking for \cite tags
                 foreach (string texFile in aTexFiles)
                 {
-                     sr = new StreamReader(filePath + mainTexFile);
-                string s = sr.ReadToEnd();
-                //parse the document looking for \cite tags, we'll store the contents in an arraylist so
-                //the global order of appearance is kept, and no repetition is allowed
-                while (s.IndexOf("\\cite{") != -1) //v2-01
-                {
-                    s = s.Substring(s.IndexOf("\\cite{") + 6); //v2-01
-                    string temp = s.Substring(0, s.IndexOf('}'));
-                    //v2-04: handle multiple keys inside single citation
-                    string[] cites = temp.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach(string c in cites)
-                    {
-                        string cite = c.TrimEnd().TrimStart(); //clear leading and trailing whitespaces
-                        if (!aCites.Contains(cite)) //check if the cite key is already there, to avoid duplicating keys
-                            aCites.Add(cite);
-                    }
-                }
-                sr.Close();
+                    sr = new StreamReader(filePath + texFile + (!texFile.EndsWith(".tex") ? ".tex" : ""));
+                	string s = sr.ReadToEnd();
+	                //parse the document looking for \cite tags, we'll store the contents in an arraylist so
+	                //the global order of appearance is kept, and no repetition is allowed
+	                while (s.IndexOf("\\cite{") != -1) //v2-01
+	                {
+	                    s = s.Substring(s.IndexOf("\\cite{") + 6); //v2-01
+	                    string temp = s.Substring(0, s.IndexOf('}'));
+	                    //v2-04: handle multiple keys inside single citation
+	                    string[] cites = temp.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+	                    foreach(string c in cites)
+	                    {
+	                        string cite = c.TrimEnd().TrimStart(); //clear leading and trailing whitespaces
+	                        if (!aCites.Contains(cite)) //check if the cite key is already there, to avoid duplicating keys
+	                            aCites.Add(cite);
+	                    }
+	                }
+                	sr.Close();
                 }
             }
             catch { }
@@ -256,6 +260,9 @@ namespace LaTeXBibitemsStyler
             catch { }
         }
 
+        /// <summary>
+        /// obtain hashtable's entry key from its value
+        /// </summary>
         private string GetKeyToValue(string value)
         {
             foreach (string key in hBibitems.Keys)
@@ -263,6 +270,19 @@ namespace LaTeXBibitemsStyler
                 if (hBibitems[key].ToString() == value) return key;
             }
             return "";
+        }
+
+        //v3-01
+        /// <summary>
+        /// write bibitems in arraylist to the output bibliography tex file
+        /// </summary>
+        private void WriteBibitems(StreamWriter sw)
+        {
+            for (int i = 0; i < aBibitems.Count; i++)
+            {
+                string value = aBibitems[i].ToString();
+                sw.Write("\t\\bibitem{" + GetKeyToValue(value) + "} " + value + "\n\n");
+            }
         }
 
         /// <summary>
@@ -282,21 +302,14 @@ namespace LaTeXBibitemsStyler
                 if (bibStyle == BibStyles.PLAIN)
                 {
                     //we simply write the \bibitems in the file
-                    foreach (string key in hBibitems.Keys)
-                    {
-                        sw.Write("\t\\bibitem{" + key + "} " + hBibitems[key].ToString() + "\n\n");
-                    }
+                    WriteBibitems(sw); //v3-01
                 }
 
                 //write bibliography in alphabetical order of the content of the \bibitems
                 if (bibStyle == BibStyles.ALPHA)
                 {
-                    aBibitems.Sort(); //default sorting of the arraylist is alphabetical asc
-                    for (int i = 0; i < aBibitems.Count; i++)
-                    {
-                        string value = aBibitems[i].ToString();
-                        sw.Write("\t\\bibitem{" + GetKeyToValue(value) + "} " + value + "\n\n");
-                    }
+                    aBibitems.Sort();
+                    WriteBibitems(sw); //v3-01
                 }
 
                 //write bibliography in the order of the appearance of cites
@@ -305,19 +318,16 @@ namespace LaTeXBibitemsStyler
                     //write \bibitem in the order of appearance of cites 
                     for (int i = 0; i < aCites.Count; i++)
                     {
-                        if (hBibitems.Contains(aCites[i].ToString()))
-                        {
-                            sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + hBibitems[aCites[i].ToString()].ToString() + "\n\n");
-                            hBibitems.Remove(aCites[i].ToString());
-                        }
+                        string value = hBibitems[aCites[i].ToString()].ToString();
+                        sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + value + "\n\n");
+
+                        aBibitems.Remove(value);
+                        hBibitems.Remove(aCites[i].ToString());
                     }
 
                     //when we've written all the cited \bibitems, there might still be some \bibitems to write (these
                     //have not been cited in document). We then write the left \bibtems in the order they were previously read
-                    foreach (string key in hBibitems.Keys)
-                    {
-                        sw.Write("\t\\bibitem{" + key + "} " + hBibitems[key].ToString() + "\n\n");
-                    }
+                    WriteBibitems(sw); //v3-01
                 }
                 //write document's postamble
                 sw.Write("\n" + postamble);
