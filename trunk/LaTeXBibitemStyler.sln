@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Web
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaTeXBibitemStyler", "LaTeXBibitemStyler\LaTeXBibitemStyler.csproj", "{B713934E-013F-4746-A5FD-05938E0811E1}"
 EndProject
 Global
