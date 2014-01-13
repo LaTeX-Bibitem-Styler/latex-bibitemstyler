@@ -133,7 +133,6 @@ namespace LaTeXBibitemsStyler
                 while (sr.Peek() >= 0)
                 {
                     string l = sr.ReadLine();
-                    string temp = "";
                     if (l.Contains("\\input{") || l.Contains("\\include{")) //v2-02 
                     {
 	                    int i = l.IndexOf("{") + 1;
@@ -145,7 +144,10 @@ namespace LaTeXBibitemsStyler
                 }
                 sr.Close();
             }
-            catch { }
+            catch (Exception ex) 
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -166,7 +168,7 @@ namespace LaTeXBibitemsStyler
 
             try
             {
-                sr = new StreamReader(filePath + mainTexFile);
+                sr = new StreamReader(mainTexFile);
                 string s = sr.ReadToEnd();
                 //parse the document looking for \cite tags, we'll store the contents in an arraylist so
                 //the global order of appearance is kept, and no repetition is allowed
@@ -179,13 +181,15 @@ namespace LaTeXBibitemsStyler
                     foreach(string c in cites)
                     {
                         string cite = c.TrimEnd().TrimStart(); //clear leading and trailing whitespaces
-                        if (!aCites.Contains(cite)) //check if the cite key is already there, to avoid duplicating keys
-                            aCites.Add(cite);
+                        aCites.Add(cite);
                     }
                 }
                 sr.Close();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -214,14 +218,16 @@ namespace LaTeXBibitemsStyler
 	                    foreach(string c in cites)
 	                    {
 	                        string cite = c.TrimEnd().TrimStart(); //clear leading and trailing whitespaces
-	                        if (!aCites.Contains(cite)) //check if the cite key is already there, to avoid duplicating keys
-	                            aCites.Add(cite);
+	                        aCites.Add(cite);
 	                    }
 	                }
                 	sr.Close();
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -257,7 +263,10 @@ namespace LaTeXBibitemsStyler
                 }
                 sr.Close();
             }
-            catch { }
+            catch (Exception ex) 
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -297,38 +306,43 @@ namespace LaTeXBibitemsStyler
                 //write document's preamble
                 sw.Write(preamble + "\n\n");
 
-                //write bibliography in the same order it was previously read
-                //it may seem quite dumb but it can be used to write the bibliography enclosed by pre and post ambles
-                if (bibStyle == BibStyles.PLAIN)
+                switch (bibStyle)
                 {
-                    //we simply write the \bibitems in the file
-                    WriteBibitems(sw); //v3-01
+                    //write bibliography in the same order it was previously read
+                    //it may seem quite dumb but it can be used to write the bibliography 
+                    //enclosed by different pre and post ambles
+                    case BibStyles.PLAIN:
+                        //we simply write the \bibitems in the file
+                        WriteBibitems(sw); //v3-01
+                        break;
+
+                    //write bibliography in alphabetical order of the content of the \bibitems
+                    case BibStyles.ALPHA:
+                        //sort bibitems and write them in the file
+                        aBibitems.Sort();
+                        WriteBibitems(sw); //v3-01
+                        break;
+
+                    //write bibliography in the order of the appearance of cites
+                    case BibStyles.UNSRT:
+                        //write \bibitems in the order of appearance of cites
+                        //remember cites can be repeated must \bibitem must not be written more than once even
+                        for (int i = 0; i < aCites.Count; i++)
+                        {
+                            string value = hBibitems[aCites[i].ToString()].ToString();
+                            if (aBibitems.Contains(value))
+                            {
+                                sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + value + "\n\n");
+                                aBibitems.Remove(value);
+                            }                            
+                        }
+
+                        //when we've written all the cited \bibitems, there might still be some \bibitems to write (these
+                        //have not been cited in document). We then write the left \bibtems in the order they were previously read
+                        WriteBibitems(sw); //v3-01
+                        break;
                 }
 
-                //write bibliography in alphabetical order of the content of the \bibitems
-                if (bibStyle == BibStyles.ALPHA)
-                {
-                    aBibitems.Sort();
-                    WriteBibitems(sw); //v3-01
-                }
-
-                //write bibliography in the order of the appearance of cites
-                if (bibStyle == BibStyles.UNSRT)
-                {
-                    //write \bibitem in the order of appearance of cites 
-                    for (int i = 0; i < aCites.Count; i++)
-                    {
-                        string value = hBibitems[aCites[i].ToString()].ToString();
-                        sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + value + "\n\n");
-
-                        aBibitems.Remove(value);
-                        hBibitems.Remove(aCites[i].ToString());
-                    }
-
-                    //when we've written all the cited \bibitems, there might still be some \bibitems to write (these
-                    //have not been cited in document). We then write the left \bibtems in the order they were previously read
-                    WriteBibitems(sw); //v3-01
-                }
                 //write document's postamble
                 sw.Write("\n" + postamble);
                 sw.Close();
