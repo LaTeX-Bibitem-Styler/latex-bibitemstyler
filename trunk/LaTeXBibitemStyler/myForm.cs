@@ -9,6 +9,13 @@ using System.IO;
 using System.Collections;
 
 /************************************************************************
+ * Version 4.0 - Revised by suggestion of Nuno Costa                    *
+ ************************************************************************
+ * v4-01: revise UNSRT generation methods, be careful when a cite has   *
+ *   no matching bibitem in the bibitems hashtable!                     *
+ ************************************************************************/
+
+/************************************************************************
  * Version 3.0 - Revised by suggestion of Günther Lientschnig           *
  ************************************************************************
  * v3-01: revise PLAIN and UNSRT generation methods, they were not   	*
@@ -79,10 +86,14 @@ namespace LaTeXBibitemsStyler
                 if (txbBibFilename.Text != "")
                 {
                     bibFilename = txbBibFilename.Text;
+                    if (!bibFilename.EndsWith(".tex"))
+                        bibFilename += ".tex";
 
                     if (txbOutputFilename.Text != "")
                     {
                         outputBibFile = txbOutputFilename.Text;
+                        if (!outputBibFile.EndsWith(".tex"))
+                            outputBibFile += ".tex";
 
                         preamble = rtxPreamble.Text;
                         postamble = rtxPostamble.Text;
@@ -329,12 +340,23 @@ namespace LaTeXBibitemsStyler
                         //remember cites can be repeated must \bibitem must not be written more than once even
                         for (int i = 0; i < aCites.Count; i++)
                         {
-                            string value = hBibitems[aCites[i].ToString()].ToString();
-                            if (aBibitems.Contains(value))
+                            try
                             {
-                                sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + value + "\n\n");
-                                aBibitems.Remove(value);
-                            }                            
+                                var key = aCites[i].ToString();
+                                if (hBibitems.ContainsKey(key)) //v4-01
+                                {
+                                    string value = hBibitems[key].ToString();
+                                    if (aBibitems.Contains(value))
+                                    {
+                                        sw.Write("\t\\bibitem{" + aCites[i].ToString() + "} " + value + "\n\n");
+                                        aBibitems.Remove(value);
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                throw ex;
+                            }
                         }
 
                         //when we've written all the cited \bibitems, there might still be some \bibitems to write (these
@@ -351,7 +373,7 @@ namespace LaTeXBibitemsStyler
                 lblResult.Text = "Yay! Made it!";
                 lblResult.ForeColor = System.Drawing.Color.Green;
             }
-            catch 
+            catch (Exception ex)
             {
                 sw.Write("\n" + postamble);
                 sw.Close();
