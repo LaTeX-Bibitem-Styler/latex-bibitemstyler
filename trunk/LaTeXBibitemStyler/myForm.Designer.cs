@@ -38,12 +38,13 @@ namespace LaTeXBibitemsStyler
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.txbBibFilename = new System.Windows.Forms.TextBox();
-            this.btnSearch = new System.Windows.Forms.Button();
+            this.btnSearchMainTexFile = new System.Windows.Forms.Button();
             this.cbxBibStyle = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.txbOutputFilename = new System.Windows.Forms.TextBox();
             this.lblResult = new System.Windows.Forms.Label();
+            this.btnSearchBiblioFile = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // rtxPreamble
@@ -129,19 +130,19 @@ namespace LaTeXBibitemsStyler
             this.txbBibFilename.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txbBibFilename.Location = new System.Drawing.Point(134, 45);
             this.txbBibFilename.Name = "txbBibFilename";
-            this.txbBibFilename.Size = new System.Drawing.Size(100, 23);
+            this.txbBibFilename.Size = new System.Drawing.Size(348, 23);
             this.txbBibFilename.TabIndex = 2;
             // 
-            // btnSearch
+            // btnSearchMainTexFile
             // 
-            this.btnSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSearch.Location = new System.Drawing.Point(488, 12);
-            this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(24, 23);
-            this.btnSearch.TabIndex = 0;
-            this.btnSearch.Text = "...";
-            this.btnSearch.UseVisualStyleBackColor = true;
-            this.btnSearch.Click += new System.EventHandler(this.Search_Click);
+            this.btnSearchMainTexFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSearchMainTexFile.Location = new System.Drawing.Point(488, 12);
+            this.btnSearchMainTexFile.Name = "btnSearchMainTexFile";
+            this.btnSearchMainTexFile.Size = new System.Drawing.Size(24, 23);
+            this.btnSearchMainTexFile.TabIndex = 0;
+            this.btnSearchMainTexFile.Text = "...";
+            this.btnSearchMainTexFile.UseVisualStyleBackColor = true;
+            this.btnSearchMainTexFile.Click += new System.EventHandler(this.SearchMainTexFile_Click);
             // 
             // cbxBibStyle
             // 
@@ -178,7 +179,7 @@ namespace LaTeXBibitemsStyler
             this.txbOutputFilename.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txbOutputFilename.Location = new System.Drawing.Point(134, 77);
             this.txbOutputFilename.Name = "txbOutputFilename";
-            this.txbOutputFilename.Size = new System.Drawing.Size(100, 23);
+            this.txbOutputFilename.Size = new System.Drawing.Size(348, 23);
             this.txbOutputFilename.TabIndex = 3;
             // 
             // lblResult
@@ -191,17 +192,29 @@ namespace LaTeXBibitemsStyler
             this.lblResult.TabIndex = 1;
             this.lblResult.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // btnSearchBiblioFile
+            // 
+            this.btnSearchBiblioFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSearchBiblioFile.Location = new System.Drawing.Point(488, 45);
+            this.btnSearchBiblioFile.Name = "btnSearchBiblioFile";
+            this.btnSearchBiblioFile.Size = new System.Drawing.Size(24, 23);
+            this.btnSearchBiblioFile.TabIndex = 8;
+            this.btnSearchBiblioFile.Text = "...";
+            this.btnSearchBiblioFile.UseVisualStyleBackColor = true;
+            this.btnSearchBiblioFile.Click += new System.EventHandler(this.SearchBiblioFile_Click);
+            // 
             // myForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(524, 418);
+            this.Controls.Add(this.btnSearchBiblioFile);
             this.Controls.Add(this.cbxBibStyle);
             this.Controls.Add(this.txbOutputFilename);
             this.Controls.Add(this.txbBibFilename);
             this.Controls.Add(this.txbMainTexFile);
-            this.Controls.Add(this.btnSearch);
+            this.Controls.Add(this.btnSearchMainTexFile);
             this.Controls.Add(this.btnRun);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label3);
@@ -233,12 +246,13 @@ namespace LaTeXBibitemsStyler
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txbBibFilename;
-        private System.Windows.Forms.Button btnSearch;
+        private System.Windows.Forms.Button btnSearchMainTexFile;
         private System.Windows.Forms.ComboBox cbxBibStyle;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txbOutputFilename;
         private System.Windows.Forms.Label lblResult;
+        private System.Windows.Forms.Button btnSearchBiblioFile;
     }
 }
 

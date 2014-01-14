@@ -53,6 +53,8 @@ namespace LaTeXBibitemsStyler
             InitializeComponent();
         }
 
+        #region [Events]
+
         private void myForm_Load(object sender, EventArgs e)
         {
             cbxBibStyle.DataSource = Enum.GetNames(typeof(BibStyles));
@@ -63,7 +65,7 @@ namespace LaTeXBibitemsStyler
             rtxPostamble.Text = "\\end{thebibliography}\n\n%%%%% CLEAR DOUBLE PAGE!\n\\newpage{\\pagestyle{empty}\\cleardoublepage}";
         }
 
-        private void Search_Click(object sender, EventArgs e)
+        private void SearchMainTexFile_Click(object sender, EventArgs e)
         {
             lblResult.Text = "";
             OpenFileDialog ofd = new OpenFileDialog();
@@ -72,6 +74,27 @@ namespace LaTeXBibitemsStyler
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 txbMainTexFile.Text = ofd.FileName;
+                txbMainTexFile.SelectAll();
+            }
+        }
+
+        private void SearchBiblioFile_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.InitialDirectory = Environment.SpecialFolder.Desktop.ToString();
+            ofd.Filter =  "TEX Files (*.tex)|*.tex";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                txbBibFilename.Text = ofd.FileName;
+                txbBibFilename.SelectAll();
+
+                string filename = txbBibFilename.Text.Substring(txbBibFilename.Text.LastIndexOf('\\') + 1);
+                if (filename.EndsWith(".tex"))
+                    filename = filename.Replace(".tex", "_new.tex");
+                else
+                    filename += "_new";
+
+                txbOutputFilename.Text = filename;
             }
         }
 
@@ -126,6 +149,8 @@ namespace LaTeXBibitemsStyler
                 lblResult.ForeColor = System.Drawing.Color.Red;
             }
         }
+
+        #endregion
 
         /// <summary>
         /// read main tex file and get the content of all \input tags
@@ -248,7 +273,7 @@ namespace LaTeXBibitemsStyler
         {
             try
             {
-                StreamReader sr = new StreamReader(filePath + bibFilename);
+                StreamReader sr = new StreamReader(bibFilename);
                 aBibitems = new ArrayList();
                 hBibitems = new Hashtable();
 
@@ -265,6 +290,7 @@ namespace LaTeXBibitemsStyler
                     else //this is the last \bibitem in the file
                         bibitem = s.Substring(0, s.IndexOf("\\end{"));
 
+                    bibitem = bibitem.Trim();
                     string key = bibitem.Substring(1, bibitem.IndexOf('}') - 1);
                     bibitem = bibitem.Replace("{" + key + "}", "").Trim().TrimEnd(new char[] { '\n', '\t' });
                     //we store the \bibitems in both a hashtable and an arraylist because we'll use the arraylist 
