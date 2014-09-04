@@ -44,12 +44,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BibStyles.cs" />
+    <Compile Include="CiteTypes.cs" />
     <Compile Include="myForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="myForm.Designer.cs">
       <DependentUpon>myForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Operations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="myForm.resx">
