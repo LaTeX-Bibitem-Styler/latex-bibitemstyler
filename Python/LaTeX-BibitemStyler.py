@@ -1,10 +1,8 @@
-##################################################################################
-##																				##
-## 							SILVIA 'PCHIWAN' MUR BLANCH							##
-##						   silvia.murblanch at gmail.com						##
-##							 LaTeX-BibitemsStyler 2009    						##
-##																				##
-################################################################################## 
+##
+## Sílvia "PchiwaN" Mur Blanch
+## silvia.murblanch at gmail.com
+## LaTeX-BibitemsStyler 2009
+################################ 
 
 from enum import Enum
 import os
