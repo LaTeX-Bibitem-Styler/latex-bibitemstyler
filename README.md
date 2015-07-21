@@ -19,6 +19,4 @@ This project currently has two flavors:
 If you found this useful, please drop us a line! Reviews and suggestions are very welcome!
 
 ---------------------------------------
-Andreea Georgescu
-
-Sílvia Mur
+Andreea Georgescu | Sílvia Mur | 2015
