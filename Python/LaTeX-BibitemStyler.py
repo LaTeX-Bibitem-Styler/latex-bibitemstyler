@@ -21,12 +21,14 @@
 # Version 3.0 - Python 3
 ###################################################################
 # handles duplicate bibitems
+# give file names and ordering style as sys.argv inputs
 ###################################################################
 
 
 from __future__ import print_function
 from collections import namedtuple, OrderedDict
 import os
+import sys
 
 bibstyles = namedtuple('bibstyles', ['PLAIN', 'ALPHA', 'UNSRT'])
 bibstyles.__new__.__defaults__ = tuple([False] * len(bibstyles._fields))
@@ -203,61 +205,83 @@ class Styler:
             print('\nBibliography file', self.outputBibFile,
                   'has been successfully created!\n')
 
-################### MAIN LOOP
+    def StyleBibitems(self):
+        '''Main function, sorts the bibitems
+        '''
+        print('\n\n')
+        print('########################################################')
+        print('######### LaTeX-BibitemsStyler by Pchiwan 2009 #########')
+        print('########################################################\n\n')
+
+        print('+ Main Tex file path (use double \'\\\')\n')
+        print(self.mainTexFile)
+        if os.path.exists(self.mainTexFile):
+
+            print('\n+ Bibliography Tex file name\n')
+            print(self.bibFilename)
+
+            print('\n+ Output bibliography Tex file name\n')
+            print(self.outputBibFile)
+
+            print('\n+ This is the default bibliography preamble\n\n', self.preamble)
+            print('\n\n+ Do you want to change it? (y/N)')
+            if input() == 'y':
+                print('\n+ Enter preamble (type \'\\q\' to submit)\n')
+                k = ''
+                self.preamble = ''
+                while k != '\q':
+                    k = input()
+                    if k != '\q':
+                        self.preamble += k
+
+            print('\n+ This is the default bibliography postamble\n\n', self.postamble)
+            print('\n\n+ Do you want to change it? (y/N)')
+            if input() == 'y':
+                print('\n+ Enter postamble (type \'\\q\' to submit)\n')
+                k = ''
+                self.postamble = ''
+                while k != '\q':
+                    k = input()
+                    if k != '\q':
+                        self.postamble += k
+
+            print('\n+ Bibliography style\n')
+            print('0 - PLAIN')
+            print('1 - ALPHA (Alphanumerical order)')
+            print('2 - UNSRT (Cite order of appearance)')
+            print(self.bibStyle)
+            print('\n\n')
+
+            self.GetInputFiles()
+            self.GetFilePath()
+            self.GetMainTexFileCites()
+            self.GetTexFileCites()
+            self.GetBibitems()
+            self.WriteBibFile()
+        else:
+            print('Please enter a valid main Tex file path')
 
 
-styler = Styler()
+def main():
+    styler = Styler()
+    if len(sys.argv) < 5:
+        print('Please run the program with at least 4 arguments:')
+        print('    - The main tex file path (use double \'\\\')')
+        print('    - The bibliography Tex file name')
+        print('    - The output bibliography Tex file name')
+        print('    - The bibliography style:')
+        print('0 - PLAIN (Original order)')
+        print('1 - ALPHA (Alphanumerical order)')
+        print('2 - UNSRT (Cite order of appearance)')
+        return
 
-print('\n\n')
-print('########################################################')
-print('######### LaTeX-BibitemsStyler by Pchiwan 2009 #########')
-print('########################################################\n\n')
+    styler.mainTexFile = sys.argv[1]
+    styler.bibFilename = sys.argv[2]
+    styler.outputBibFile = sys.argv[3]
+    style_index = int(sys.argv[4])
+    styler.bibStyle = bibstyles(**{bibstyles._fields[style_index]: True})
+    styler.StyleBibitems()
 
-print('+ Enter main Tex file path (use double \'\\\')\n')
-styler.mainTexFile = input()
-if os.path.exists(styler.mainTexFile):
 
-    print('\n+ Enter bibliography Tex file name\n')
-    styler.bibFilename = input()
-
-    print('\n+ Enter output bibliography Tex file name\n')
-    styler.outputBibFile = input()
-
-    print('\n+ This is the default bibliography preamble\n\n', styler.preamble)
-    print('\n\n+ Do you want to change it? (y/n)')
-    if input() == 'y':
-        print('\n+ Enter preamble (type \'\\q\' to submit)\n')
-        k = ''
-        styler.preamble = ''
-        while k != '\q':
-            k = input()
-            if k != '\q':
-                styler.preamble += k
-
-    print('\n+ This is the default bibliography postamble\n\n', styler.postamble)
-    print('\n\n+ Do you want to change it? (y/n)')
-    if input() == 'y':
-        print('\n+ Enter postamble (type \'\\q\' to submit)\n')
-        k = ''
-        styler.postamble = ''
-        while k != '\q':
-            k = input()
-            if k != '\q':
-                styler.postamble += k
-
-    print('\n+ Select a bibliography style\n')
-    print('0 - PLAIN')
-    print('1 - ALPHA (Alphanumerical order)')
-    print('2 - UNSRT (Cite order of appearance)')
-    inp = int(input())
-    styler.bibStyle = bibstyles(**{bibstyles._fields[inp]: True})
-    print('\n\n')
-
-    styler.GetInputFiles()
-    styler.GetFilePath()
-    styler.GetMainTexFileCites()
-    styler.GetTexFileCites()
-    styler.GetBibitems()
-    styler.WriteBibFile()
-else:
-    print('Please enter a valid main Tex file path')
+if __name__ == '__main__':
+    main()
