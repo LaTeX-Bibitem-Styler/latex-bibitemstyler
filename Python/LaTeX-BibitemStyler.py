@@ -213,7 +213,7 @@ class Styler:
         print('######### LaTeX-BibitemsStyler by Pchiwan 2009 #########')
         print('########################################################\n\n')
 
-        print('+ Main Tex file path (use double \'\\\')\n')
+        print('+ Main Tex file path (use double \'\\\' if on Windows)\n')
         print(self.mainTexFile)
         if os.path.exists(self.mainTexFile):
 
@@ -272,7 +272,7 @@ def main():
                         style_index=int(sys.argv[4]))
     except:
         print('Please run the program with 4 arguments:')
-        print('    - The main tex file path (use double \'\\\')')
+        print('    - The main tex file path (use double \'\\\' if on Windows)')
         print('    - The bibliography Tex file name')
         print('    - The output bibliography Tex file name')
         print('    - The bibliography style:')

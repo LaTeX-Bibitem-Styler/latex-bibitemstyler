@@ -22,9 +22,9 @@ If you found this useful, please drop us a line! Reviews and suggestions are ver
 ### Usage: Python code
 
 Run the program with command-line arguments:
-- The main tex file path (use double '\')
-- The input bibliography tex file name
-- The output bibliography tex file name
+- The main tex file path (use double '\' if you're on Windows)
+- The input bibliography tex file name. Mind that all your latex project’s files must be in the same directory.
+- The output bibliography tex file name (the name of the new bibliography file that will be generated)
 - The bibliography style:
     - 0: PLAIN (Original order)
     - 1: ALPHA (Alphanumerical order)
