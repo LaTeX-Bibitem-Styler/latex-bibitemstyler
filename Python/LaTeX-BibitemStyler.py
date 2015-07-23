@@ -35,11 +35,11 @@ bibstyles.__new__.__defaults__ = tuple([False] * len(bibstyles._fields))
 
 
 class Styler:
-    def __init__(self):
-        self.filePath = ''
-        self.mainTexFile = ''
-        self.bibFilename = ''
-        self.outputBibFile = ''
+    def __init__(self, mainTexFile='', bibFilename='', outputBibFile='', style_index=0):
+        self.mainTexFile = mainTexFile
+        self.bibFilename = bibFilename
+        self.outputBibFile = outputBibFile
+        self.bibStyle = bibstyles(**{bibstyles._fields[style_index]: True})
         self.preamble = '\\begin{thebibliography}{100}'
         self.postamble = '\\end{thebibliography}\n\n%%%%% CLEAR DOUBLE PAGE!\n\\newpage{\\pagestyle{empty}\\cleardoublepage}'
         self.aTexFiles = []
@@ -246,10 +246,12 @@ class Styler:
                         self.postamble += k
 
             print('\n+ Bibliography style\n')
-            print('0 - PLAIN')
-            print('1 - ALPHA (Alphanumerical order)')
-            print('2 - UNSRT (Cite order of appearance)')
-            print(self.bibStyle)
+            if self.bibStyle.PLAIN:
+                print('0 - PLAIN')
+            if self.bibStyle.ALPHA:
+                print('1 - ALPHA (Alphanumerical order)')
+            if self.bibStyle.UNSRT:
+                print('2 - UNSRT (Cite order of appearance)')
             print('\n\n')
 
             self.GetInputFiles()
@@ -263,9 +265,13 @@ class Styler:
 
 
 def main():
-    styler = Styler()
-    if len(sys.argv) < 5:
-        print('Please run the program with at least 4 arguments:')
+    try:
+        styler = Styler(mainTexFile=sys.argv[1],
+                        bibFilename=sys.argv[2],
+                        outputBibFile=sys.argv[3],
+                        style_index=int(sys.argv[4]))
+    except:
+        print('Please run the program with 4 arguments:')
         print('    - The main tex file path (use double \'\\\')')
         print('    - The bibliography Tex file name')
         print('    - The output bibliography Tex file name')
@@ -273,13 +279,8 @@ def main():
         print('0 - PLAIN (Original order)')
         print('1 - ALPHA (Alphanumerical order)')
         print('2 - UNSRT (Cite order of appearance)')
-        return
-
-    styler.mainTexFile = sys.argv[1]
-    styler.bibFilename = sys.argv[2]
-    styler.outputBibFile = sys.argv[3]
-    style_index = int(sys.argv[4])
-    styler.bibStyle = bibstyles(**{bibstyles._fields[style_index]: True})
+        print()
+        raise
     styler.StyleBibitems()
 
 
