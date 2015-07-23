@@ -18,5 +18,31 @@ This project currently has two flavors:
 
 If you found this useful, please drop us a line! Reviews and suggestions are very welcome!
 
+
+### Usage: Python code
+
+Run the program with command-line arguments:
+- The main tex file path (use double '\')
+- The input bibliography tex file name
+- The output bibliography tex file name
+- The bibliography style:
+    - 0: PLAIN (Original order)
+    - 1: ALPHA (Alphanumerical order)
+    - 2: UNSRT (Cite order of appearance)
+
+Example:
+
+    python3 LaTeX-BibitemStyler.py main_file.tex bibliography_original.tex bibliography_ordered.tex 2
+
+Then in the main tex file add
+
+>\input{bibliography_ordered.tex}
+
+before
+
+>\end{document}
+
+
 ---------------------------------------
 Andreea Georgescu | Sílvia Mur | 2015
+
