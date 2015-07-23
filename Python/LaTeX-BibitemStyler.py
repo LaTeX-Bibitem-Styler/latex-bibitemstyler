@@ -1,3 +1,4 @@
+###################################################################
 ## LaTeX-BibitemsStyler
 ##
 ## Sílvia "PchiwaN" Mur Blanch
@@ -5,16 +6,21 @@
 ##
 ## Andreea Georgescu
 ## andreea.i.georgescu at gmail.com
-################################
+###################################################################
 
 ###################################################################
 # Version 2.0 - Revised by suggestion of Olli Nummi
 ###################################################################
-# v2-01: replace '~\cite' by '\cite' in the search for cites
-# v2-02: use '\include' as well as '\input' to search for tex files
-# v2-03: search for cites in the main tex file too
-# v2-04: handle multiple keys inside single citation
+# replace '~\cite' by '\cite' in the search for cites
+# use '\include' as well as '\input' to search for tex files
+# search for cites in the main tex file too
+# handle multiple keys inside single citation
 ###################################################################
+
+###################################################################
+# Version 3.0 - Python 3
+###################################################################
+
 
 from __future__ import print_function
 from collections import namedtuple
@@ -37,18 +43,18 @@ class Styler:
         self.aBibitems = []
         self.dBibitems = {}
 
-    '''read main tex file and get the content of all \input tags
-    '''
     def GetInputFiles(self):
+        '''Read main tex file and get the content of all \input tags
+        '''
         print('... getting input files')
         try:
             f = open(self.mainTexFile, 'r')
             s = f.read()  # read file to end
             # move parsing cursos to beginning of document
             s = s[s.find('\\begin{document}')+len('\\begin{document}'):len(s)]
-            # parse the file looking for \input or \include commands #v2-02
+            # parse the file looking for \input or \include commands
             while len(s) > 0:
-                if s.find('\\input{') == -1 and s.find('\\include{') == -1:  # v2-02
+                if s.find('\\input{') == -1 and s.find('\\include{') == -1:
                     break
                 else:
                     if s.find('\\input{') != -1 and s.find('\\include{') != -1:  # there are both commands
@@ -74,24 +80,24 @@ class Styler:
             print('An error occurred while reading', self.mainTexFile)
             raise
 
-    '''extract main file path from main tex file
-    '''
     def GetFilePath(self):
+        '''Extract main file path from main tex file
+        '''
         print('... getting file path')
         self.filePath = self.mainTexFile[0:self.mainTexFile.rfind('\\') + 1]
 
-    '''search for cites in the project's main tex file  #v2-03
-    '''
-    def GetMainTexFileCites(self):  # v2-03
+    def GetMainTexFileCites(self):
+        '''Search for cites in the project's main tex file
+        '''
         print('... getting main tex file cites')
         try:
             f = open(self.filePath + self.mainTexFile, 'r')
             s = f.read()  # read file to end
             # parse current file looking for \cite commands, and store all cite keys in an array in their order of appearance
-            while s.find('\\cite{') != -1:  # v2-01
-                s = s[s.find('\\cite{')+len('\\cite{'):len(s)]  # v2-01
+            while s.find('\\cite{') != -1:
+                s = s[s.find('\\cite{')+len('\\cite{'):len(s)]
                 temp = s[0:s.find('}')]
-                # v2-04: handle multiple keys inside single citation
+                # handle multiple keys inside single citation
                 cites = temp.split(',')
                 for c in cites:
                     cite = c.strip()  # clear leading and trailing whitespaces
@@ -104,19 +110,20 @@ class Styler:
             print('An error occurred while reading main .tex file')
             raise
 
-    '''read all the project's tex files and get the contents of all \cite tags, with no repetition
-    '''
     def GetTexFileCites(self):
+        '''Read all the project's tex files and get the contents of all \cite tags,
+        with no repetition
+        '''
         print('... getting tex files cites')
         try:
             for texFile in self.aTexFiles:
                 f = open(self.filePath + texFile, 'r')
                 s = f.read()  # read file to end
                 # parse current file looking for \cite commands, and store all cite keys in an array in their order of appearance
-                while s.find('\\cite{') != -1:  # v2-01
-                    s = s[s.find('\\cite{')+len('\\cite{'):len(s)]  # v2-01
+                while s.find('\\cite{') != -1:
+                    s = s[s.find('\\cite{')+len('\\cite{'):len(s)]
                     temp = s[0:s.find('}')]
-                    # v2-04: handle multiple keys inside single citation
+                    # handle multiple keys inside single citation
                     cites = temp.split(',')
                     for c in cites:
                         cite = c.strip()  # clear leading and trailing whitespaces
@@ -129,9 +136,9 @@ class Styler:
             print('An error occurred while reading input .tex file')
             raise
 
-    '''read bibliography files and get all \bibitems
-    '''
     def GetBibitems(self):
+        '''Read bibliography files and get all \bibitems
+        '''
         print('... getting \\bibitems')
         try:
             with open(self.filePath + self.bibFilename, 'br') as f:
@@ -162,9 +169,9 @@ class Styler:
                 return key
         return None
 
-    '''write output bibliography tex file, according to the specified sorting method
-    '''
     def WriteBibFile(self):
+        '''Write output bibliography tex file, according to the specified sorting method
+        '''
         print('... writing bibliography file')
         try:
             f = open(self.filePath + self.outputBibFile, 'w')
