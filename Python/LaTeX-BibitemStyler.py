@@ -20,10 +20,12 @@
 ###################################################################
 # Version 3.0 - Python 3
 ###################################################################
+# handles duplicate bibitems
+###################################################################
 
 
 from __future__ import print_function
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import os
 
 bibstyles = namedtuple('bibstyles', ['PLAIN', 'ALPHA', 'UNSRT'])
@@ -40,8 +42,7 @@ class Styler:
         self.postamble = '\\end{thebibliography}\n\n%%%%% CLEAR DOUBLE PAGE!\n\\newpage{\\pagestyle{empty}\\cleardoublepage}'
         self.aTexFiles = []
         self.aCites = []
-        self.aBibitems = []
-        self.dBibitems = {}
+        self.dBibitems = OrderedDict()
 
     def GetInputFiles(self):
         '''Read main tex file and get the content of all \input tags
@@ -155,19 +156,12 @@ class Styler:
                 bibitem = bibitem.replace('{' + key + '}', '')  # remove key from the \bibitem entry
                 bibitem = bibitem.strip()
                 bibitem = bibitem.rstrip('\n\t')  # remove trailing characters from the \bibitem entry
-                self.aBibitems.append(bibitem)  # we store the \bibitem in an array; we'll use it for alphabetically sorting the entries
                 self.dBibitems[key] = bibitem  # we store the \bibitem in a dictionary; we'll access the entry by its key
             f.close()
         except:
             print('An error has ocurred while parsing the bibliography file,',
                   self.bibFilename)
             raise
-
-    def GetKeyToValue(self, value):
-        for key in self.dBibitems.keys():
-            if self.dBibitems[key] == value:
-                return key
-        return None
 
     def WriteBibFile(self):
         '''Write output bibliography tex file, according to the specified sorting method
@@ -181,24 +175,23 @@ class Styler:
             # write bibliography according to the chosen style
             if self.bibStyle.PLAIN:  # same \bibitem order as the original bibliography file, but with specified preamble and postamble
                 print('\t\twriting \\bibitems PLAIN style')
-                for value in self.aBibitems:
-                    f.write('\t\\bibitem{' + self.GetKeyToValue(value) + '} ' + value + '\n\n')
+                for key in self.dBibitems:
+                    f.write('\t\\bibitem{'+ key +'} '+ self.dBibitems[key] +'\n\n')
 
-            if self.bibStyle.ALPHA:  # \bibitem entry alphabetical order
+            elif self.bibStyle.ALPHA:  # \bibitem entry alphabetical order
                 print('\t\twriting \\bibitems ALPHA style')
-                self.aBibitems.sort()
-                for value in self.aBibitems:
-                    f.write('\t\\bibitem{' + self.GetKeyToValue(value) + '} ' + value + '\n\n')
+                for key in sorted(self.dBibitems, key=self.dBibitems.get):
+                    f.write('\t\\bibitem{'+ key +'} '+ self.dBibitems[key] +'\n\n')
 
-            if self.bibStyle.UNSRT:  # \bibitem key order of appearance in the latex project files
+            elif self.bibStyle.UNSRT:  # \bibitem key order of appearance in the latex project files
                 print('\t\twriting \\bibitems UNSRT style')
                 for key in self.aCites:
                     f.write('\t\\bibitem{' + key + '} ' + self.dBibitems[key] + '\n\n')
-                    self.aBibitems.remove(self.dBibitems[key])  # remove the \bibitem that we just wrote from the \bibitems array
+                    del self.dBibitems[key]  # remove the \bibitem that we just wrote from the \bibitems array
                 # at this point, the \bibitems that were cited in the latex project files have been written in the output file
                 # we know proceed to write the \bibitems that were not cited in the latex project, in the same order they were read
-                for value in self.aBibitems:
-                    f.write('\t\\bibitem{' + self.GetKeyToValue(value) + '} ' + value + '\n\n')
+                for key in self.dBibitems:
+                    f.write('\t\\bibitem{' + key +'} '+ self.dBibitems[key] +'\n\n')
             print('\t\twriting postamble')
             f.write('\n' + self.postamble)
         except:
