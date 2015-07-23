@@ -1,7 +1,10 @@
+## LaTeX-BibitemsStyler
 ##
 ## Sílvia "PchiwaN" Mur Blanch
 ## silvia.murblanch at gmail.com
-## LaTeX-BibitemsStyler 2009
+##
+## Andreea Georgescu
+## andreea.i.georgescu at gmail.com
 ################################
 
 ###################################################################
@@ -13,29 +16,31 @@
 # v2-04: handle multiple keys inside single citation
 ###################################################################
 
-from enum import Enum
+from __future__ import print_function
+from collections import namedtuple
 import os
 
-BibStyles = Enum('PLAIN', 'ALPHA', 'UNSRT')
+bibstyles = namedtuple('bibstyles', ['PLAIN', 'ALPHA', 'UNSRT'])
+bibstyles.__new__.__defaults__ = tuple([False] * len(bibstyles._fields))
 
 
 class Styler:
     def __init__(self):
-        filePath = ''
-        mainTexFile = ''
-        bibFilename = ''
-        outputBibFile = ''
-        preamble = '\\begin{thebibliography}{100}'
-        postamble = '\\end{thebibliography}\n\n%%%%% CLEAR DOUBLE PAGE!\n\\newpage{\\pagestyle{empty}\\cleardoublepage}'
-        aTexFiles = []
-        aCites = []
-        aBibitems = []
-        dBibitems = dict([])
+        self.filePath = ''
+        self.mainTexFile = ''
+        self.bibFilename = ''
+        self.outputBibFile = ''
+        self.preamble = '\\begin{thebibliography}{100}'
+        self.postamble = '\\end{thebibliography}\n\n%%%%% CLEAR DOUBLE PAGE!\n\\newpage{\\pagestyle{empty}\\cleardoublepage}'
+        self.aTexFiles = []
+        self.aCites = []
+        self.aBibitems = []
+        self.dBibitems = {}
 
     '''read main tex file and get the content of all \input tags
     '''
     def GetInputFiles(self):
-        print '... getting input files'
+        print('... getting input files')
         try:
             f = open(self.mainTexFile, 'r')
             s = f.read()  # read file to end
@@ -59,25 +64,26 @@ class Styler:
 
                     # get file name from command
                     texFile = s[0:s.find('}')]
-                    print '\t\t',texFile
+                    print('\t\t', texFile)
                     if texFile != self.bibFilename:
                         self.aTexFiles.append(texFile)
                     # move parsing cursor past the current \input command
                     s = s[s.find('}'):len(s)]
             f.close()
         except:
-            print 'An error occurred while reading',self.mainTexFile
+            print('An error occurred while reading', self.mainTexFile)
+            raise
 
     '''extract main file path from main tex file
     '''
     def GetFilePath(self):
-        print '... getting file path'
+        print('... getting file path')
         self.filePath = self.mainTexFile[0:self.mainTexFile.rfind('\\') + 1]
 
     '''search for cites in the project's main tex file  #v2-03
     '''
     def GetMainTexFileCites(self):  # v2-03
-        print '... getting main tex file cites'
+        print('... getting main tex file cites')
         try:
             f = open(self.filePath + self.mainTexFile, 'r')
             s = f.read()  # read file to end
@@ -95,12 +101,13 @@ class Styler:
                         self.aCites.append(cite)
             f.close()
         except:
-            print 'An error occurred while reading main .tex file'
+            print('An error occurred while reading main .tex file')
+            raise
 
     '''read all the project's tex files and get the contents of all \cite tags, with no repetition
     '''
     def GetTexFileCites(self):
-        print '... getting tex files cites'
+        print('... getting tex files cites')
         try:
             for texFile in self.aTexFiles:
                 f = open(self.filePath + texFile, 'r')
@@ -119,15 +126,17 @@ class Styler:
                             self.aCites.append(cite)
                 f.close()
         except:
-            print 'An error occurred while reading input .tex file'
+            print('An error occurred while reading input .tex file')
+            raise
 
     '''read bibliography files and get all \bibitems
     '''
     def GetBibitems(self):
-        print '... getting \\bibitems'
+        print('... getting \\bibitems')
         try:
-            f = open(self.filePath + self.bibFilename, 'r')
-            s = f.read()  # read to end
+            with open(self.filePath + self.bibFilename, 'br') as f:
+                binary = f.read()  # read to end
+                s = binary.decode('latin-1')
             # parse bibliography file and store bibitems in a dictionary
             while s.find('\\bibitem') != -1:
                 s = s[s.find('\\bibitem')+len('\\bibitem'):len(s)]
@@ -142,11 +151,10 @@ class Styler:
                 self.aBibitems.append(bibitem)  # we store the \bibitem in an array; we'll use it for alphabetically sorting the entries
                 self.dBibitems[key] = bibitem  # we store the \bibitem in a dictionary; we'll access the entry by its key
             f.close()
-            # print self.aCites
-            # print self.aBibitems
-            # print self.dBibitems
         except:
-            print 'An error has ocurred while parsing the bibliography file,',self.bibFilename
+            print('An error has ocurred while parsing the bibliography file,',
+                  self.bibFilename)
+            raise
 
     def GetKeyToValue(self, value):
         for key in self.dBibitems.keys():
@@ -157,26 +165,26 @@ class Styler:
     '''write output bibliography tex file, according to the specified sorting method
     '''
     def WriteBibFile(self):
-        print '... writing bibliography file'
+        print('... writing bibliography file')
         try:
             f = open(self.filePath + self.outputBibFile, 'w')
             # write bibliography file preamble
-            print '\t\twriting preamble'
+            print('\t\twriting preamble')
             f.write(self.preamble + '\n\n')
             # write bibliography according to the chosen style
-            if self.bibStyle == BibStyles.PLAIN:  # same \bibitem order as the original bibliography file, but with specified preamble and postamble
-                print '\t\twriting \\bibitems PLAIN style'
+            if self.bibStyle.PLAIN:  # same \bibitem order as the original bibliography file, but with specified preamble and postamble
+                print('\t\twriting \\bibitems PLAIN style')
                 for value in self.aBibitems:
                     f.write('\t\\bibitem{' + self.GetKeyToValue(value) + '} ' + value + '\n\n')
 
-            if self.bibStyle == BibStyles.ALPHA:  # \bibitem entry alphabetical order
-                print '\t\twriting \\bibitems ALPHA style'
+            if self.bibStyle.ALPHA:  # \bibitem entry alphabetical order
+                print('\t\twriting \\bibitems ALPHA style')
                 self.aBibitems.sort()
                 for value in self.aBibitems:
                     f.write('\t\\bibitem{' + self.GetKeyToValue(value) + '} ' + value + '\n\n')
 
-            if self.bibStyle == BibStyles.UNSRT:  # \bibitem key order of appearance in the latex project files
-                print '\t\twriting \\bibitems UNSRT style'
+            if self.bibStyle.UNSRT:  # \bibitem key order of appearance in the latex project files
+                print('\t\twriting \\bibitems UNSRT style')
                 for key in self.aCites:
                     f.write('\t\\bibitem{' + key + '} ' + self.dBibitems[key] + '\n\n')
                     self.aBibitems.remove(self.dBibitems[key])  # remove the \bibitem that we just wrote from the \bibitems array
@@ -184,62 +192,66 @@ class Styler:
                 # we know proceed to write the \bibitems that were not cited in the latex project, in the same order they were read
                 for value in self.aBibitems:
                     f.write('\t\\bibitem{' + self.GetKeyToValue(value) + '} ' + value + '\n\n')
-            print '\t\twriting postamble'
+            print('\t\twriting postamble')
             f.write('\n' + self.postamble)
         except:
-            print 'An error has ocurred while writing the output bibliography file,',self.outputBibFile
+            print('An error has ocurred while writing the output bibliography file,',
+                  self.outputBibFile)
+            raise
         else:
             f.close()
-            print '\nBibliography file',self.outputBibFile,'has been successfully created!\n'
+            print('\nBibliography file', self.outputBibFile,
+                  'has been successfully created!\n')
 
 ################### MAIN LOOP
 
 
 styler = Styler()
 
-print '\n\n'
-print '########################################################'
-print '######### LaTeX-BibitemsStyler by Pchiwan 2009 #########'
-print '########################################################\n\n'
+print('\n\n')
+print('########################################################')
+print('######### LaTeX-BibitemsStyler by Pchiwan 2009 #########')
+print('########################################################\n\n')
 
-print '+ Enter main Tex file path (use double \'\\\')\n'
-styler.mainTexFile = raw_input()
+print('+ Enter main Tex file path (use double \'\\\')\n')
+styler.mainTexFile = input()
 if os.path.exists(styler.mainTexFile):
 
-    print '\n+ Enter bibliography Tex file name\n'
-    styler.bibFilename = raw_input()
+    print('\n+ Enter bibliography Tex file name\n')
+    styler.bibFilename = input()
 
-    print '\n+ Enter output bibliography Tex file name\n'
-    styler.outputBibFile = raw_input()
+    print('\n+ Enter output bibliography Tex file name\n')
+    styler.outputBibFile = input()
 
-    print '\n+ This is the default bibliography preamble\n\n',styler.preamble
-    print '\n\n+ Do you want to change it? (y/n)'
-    if raw_input() == 'y':
-        print '\n+ Enter preamble (type \'\\q\' to submit)\n'
+    print('\n+ This is the default bibliography preamble\n\n', styler.preamble)
+    print('\n\n+ Do you want to change it? (y/n)')
+    if input() == 'y':
+        print('\n+ Enter preamble (type \'\\q\' to submit)\n')
         k = ''
         styler.preamble = ''
         while k != '\q':
-            k = raw_input()
+            k = input()
             if k != '\q':
                 styler.preamble += k
 
-    print '\n+ This is the default bibliography postamble\n\n',styler.postamble
-    print '\n\n+ Do you want to change it? (y/n)'
-    if raw_input() == 'y':
-        print '\n+ Enter postamble (type \'\\q\' to submit)\n'
+    print('\n+ This is the default bibliography postamble\n\n', styler.postamble)
+    print('\n\n+ Do you want to change it? (y/n)')
+    if input() == 'y':
+        print('\n+ Enter postamble (type \'\\q\' to submit)\n')
         k = ''
         styler.postamble = ''
         while k != '\q':
-            k = raw_input()
+            k = input()
             if k != '\q':
                 styler.postamble += k
 
-    print '\n+ Select a bibliography style\n'
-    print '0 - PLAIN'
-    print '1 - ALPHA (Alphanumerical order)'
-    print '2 - UNSRT (Cite order of appearance)'
-    styler.bibStyle = BibStyles[int(raw_input())]
-    print '\n\n'
+    print('\n+ Select a bibliography style\n')
+    print('0 - PLAIN')
+    print('1 - ALPHA (Alphanumerical order)')
+    print('2 - UNSRT (Cite order of appearance)')
+    inp = int(input())
+    styler.bibStyle = bibstyles(**{bibstyles._fields[inp]: True})
+    print('\n\n')
 
     styler.GetInputFiles()
     styler.GetFilePath()
@@ -248,4 +260,4 @@ if os.path.exists(styler.mainTexFile):
     styler.GetBibitems()
     styler.WriteBibFile()
 else:
-    print 'Please enter a valid main Tex file path'
+    print('Please enter a valid main Tex file path')
