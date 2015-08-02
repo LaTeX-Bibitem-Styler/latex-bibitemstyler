@@ -24,7 +24,7 @@ If you found this useful, please drop us a line! Reviews and suggestions are ver
 
 It’s very easy to use, just fill in the textboxes…
 
-![.NET application screenshot](C#.NET/LaTeXBibitemStyler/screenshot.png?raw=true)
+![.NET application screenshot](C%23.NET/LaTeXBibitemStyler/screenshot.png?raw=true)
 
 ##### Main tex file
 The main file of your latex project. I.e.: thesis.tex. See example below:
