@@ -26,8 +26,8 @@ It’s very easy to use, just fill in the textboxes…
 
 ![.NET application screenshot](C%23.NET/LaTeXBibitemStyler/screenshot.png?raw=true)
 
-##### Main tex file
-The main file of your latex project. I.e.: thesis.tex. See example below:
+##### Main Tex File
+The main file of your LaTeX project. I.e.: `thesis.tex`. See example below:
 
     \documentclass[letterpaper,oneside,british,english,11pt]{book}
     \usepackage[T1]{fontenc}
@@ -65,8 +65,8 @@ The main file of your latex project. I.e.: thesis.tex. See example below:
     \addcontentsline{toc}{chapter}{\numberline{}\sf\bfseries{Bibliography}}
     \end{document}
 
-##### Biblio filename
-The latex file where you’ve written your bibliography in a plain style (not a .bib file, it must be a .tex file!). I.e.: biblio.tex. See example below:
+##### Biblio Filename
+The LaTeX file where you’ve written your bibliography in a plain style (not a `.bib` file, it must be a `.tex` file!). I.e.: `biblio.tex`. See example below:
 
     \begin{thebibliography}{100}
         \bibitem{army0}  BEN  KAGE.  \emph{Roomba  maker  iRobot  also  developing  military 
@@ -93,19 +93,20 @@ The latex file where you’ve written your bibliography in a plain style (not a 
     %%%%% CLEAR DOUBLE PAGE!
     \newpage{\pagestyle{empty}\cleardoublepage}
 
-##### Output filename
+##### Output Filename
 Name of the new bibliography file that will be generated.
 
-##### Bibliography style
+##### Bibliography Style
 - PLAIN. Simply rewrite the file with different preamble and postamble.
 - APLHA. Generate bibliography file with cites in alphabetical order.
-- UNSRT.  Generate  bibliography  file  with  cites  in  order  of  appearance  (goes  through  all your latex project’s tex files and fetches all cite references).
+- UNSRT. Generate  bibliography  file  with  cites  in  order  of  appearance  (goes through  all your latex project’s tex files and fetches all cite references).
 
 ##### Preamble
-You might want to change your biblio latex file’s predefined preamble.
+You might want to change your bibliography file’s predefined preamble.
 
 ##### Postamble
-You might want to change your biblio latex file’s predefined postamble.
+You might want to change your bibliography file’s predefined postamble.
+
 
 Finally, just hit **RUN!** and let the application perform its magic, it’ll be done in a second. You’ll find the newly generated bibliography file in the original file’s path.
 
