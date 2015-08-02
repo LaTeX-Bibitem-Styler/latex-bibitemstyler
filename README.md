@@ -69,26 +69,25 @@ The main file of your LaTeX project. I.e.: `thesis.tex`. See example below:
 The LaTeX file where you’ve written your bibliography in a plain style (not a `.bib` file, it must be a `.tex` file!). I.e.: `biblio.tex`. See example below:
 
     \begin{thebibliography}{100}
-        \bibitem{army0}  BEN  KAGE.  \emph{Roomba  maker  iRobot  also  developing  military 
-        robots for Pentagon}. [web page], 14 December 2006. NaturalNews. [Visited: 23 
-        January 2009]. URL: \url{http://www.naturalnews.com/021301.html}.
+        \bibitem{army0} BEN KAGE. \emph{Roomba maker iRobot also developing military robots for Pentagon}. 
+        [web page], 14 December 2006. NaturalNews. [Visited: 23 January 2009]. 
+        URL: \url{http://www.naturalnews.com/021301.html}.
         
-        \bibitem{army2} WADE ROUSH. \emph{iRobot Wins \$3.75M Army Contract to Develop 
-        Warrior  Robot  |  Xconomy}.  [web  page],  2  October  2008.  Xconomy  Boston. 
-        [Visited:  23  January  2009].  URL: 
-        \url{http://www.xconomy.com/boston/2008/10/02/irobot-wins-375m-army-contractto-develop-warrior-robot/}.
+        \bibitem{army2} WADE ROUSH. \emph{iRobot Wins \$3.75M Army Contract to Develop Warrior Robot | Xconomy}. 
+        [web page], 2 October 2008. Xconomy Boston. [Visited: 23 January 2009]. 
+        URL: \url{http://www.xconomy.com/boston/2008/10/02/irobot-wins-375m-army-contractto-develop-warrior-robot/}.
         
-        \bibitem{anylogic}  XJ  TECHNOLOGIES.  \emph{AnyLogic  -  Xjtek}.  [web  page],  29 
-        December  2008.  XJ  Technologies  Company.  [Visited:  18  December  2008].  URL: 
-        \url{http://www.xjtek.com/anylogic/}.
+        \bibitem{anylogic} XJ TECHNOLOGIES. \emph{AnyLogic - Xjtek}. 
+        [web page], 29 December 2008. XJ Technologies Company. [Visited: 18 December 2008]. 
+        URL: \url{http://www.xjtek.com/anylogic/}.
         
-        \bibitem{simulink}  THE  MATHWORKS.  \emph{Simulink  -  Simulation  and  Model-Based 
-        Design}.  [web  page],  January  2009.  The  Mathworks,  Inc.  [Visited:  18  December 
-        2008]. URL: \url{http://www.mathworks.com/products/simulink/}.
+        \bibitem{simulink} THE MATHWORKS. \emph{Simulink - Simulation and Model-Based Design}. 
+        [web page], January  2009. The Mathworks, Inc. [Visited: 18 December 2008]. 
+        URL: \url{http://www.mathworks.com/products/simulink/}.
         
-        \bibitem{pywin}  MARK  HAMMOND.  \emph{SourceForge.net:  Python  for  Windows 
-        ex,ensions}.  [web  page],  31  July  2008.  SourceForge.net.  [Visited:  14  April 
-        2008]. URL: \url{http://sourceforge.net/projects/pywin32/}.        
+        \bibitem{pywin} MARK HAMMOND. \emph{SourceForge.net: Python for Windows extensions}. 
+        [web page], 31 July 2008. SourceForge.net. [Visited: 14 April 2008]. 
+        URL: \url{http://sourceforge.net/projects/pywin32/}.        
     \end{thebibliography}
     %%%%% CLEAR DOUBLE PAGE!
     \newpage{\pagestyle{empty}\cleardoublepage}
@@ -99,7 +98,7 @@ Name of the new bibliography file that will be generated.
 ##### Bibliography Style
 - PLAIN. Simply rewrite the file with different preamble and postamble.
 - APLHA. Generate bibliography file with cites in alphabetical order.
-- UNSRT. Generate  bibliography  file  with  cites  in  order  of  appearance  (goes through  all your latex project’s tex files and fetches all cite references).
+- UNSRT. Generate bibliography file with cites in order of appearance (goes through all your LaTeX project’s `.tex` files and fetches all cite references).
 
 ##### Preamble
 You might want to change your bibliography file’s predefined preamble.
