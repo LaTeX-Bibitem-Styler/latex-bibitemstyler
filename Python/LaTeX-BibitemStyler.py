@@ -53,8 +53,8 @@ class Styler:
         try:
             f = open(self.mainTexFile, 'r')
             s = f.read()  # read file to end
-            # move parsing cursos to beginning of document
-            s = s[s.find('\\begin{document}')+len('\\begin{document}'):len(s)]
+            # move parsing cursors to beginning of document
+            s = s[s.find('\\begin{document}')+len('\\begin{document}'):]
             # parse the file looking for \input or \include commands
             while len(s) > 0:
                 if s.find('\\input{') == -1 and s.find('\\include{') == -1:
@@ -62,22 +62,22 @@ class Styler:
                 else:
                     if s.find('\\input{') != -1 and s.find('\\include{') != -1:  # there are both commands
                         if s.find('\\input{') < s.find('\\include{'):  # \input command comes before \include command
-                            s = s[s.find('\\input{')+len('\\input{'):len(s)]
+                            s = s[s.find('\\input{')+len('\\input{'):]
                         else:
-                            s = s[s.find('\\include{')+len('\\include{'):len(s)]
+                            s = s[s.find('\\include{')+len('\\include{'):]
                     else:
                         if s.find('\\input{') != -1:
-                            s = s[s.find('\\input{')+len('\\input{'):len(s)]
+                            s = s[s.find('\\input{')+len('\\input{'):]
                         else:
-                            s = s[s.find('\\include{')+len('\\include{'):len(s)]
+                            s = s[s.find('\\include{')+len('\\include{'):]
 
                     # get file name from command
-                    texFile = s[0:s.find('}')]
+                    texFile = s[:s.find('}')]
                     print('\t\t', texFile)
                     if texFile != self.bibFilename:
                         self.aTexFiles.append(texFile)
                     # move parsing cursor past the current \input command
-                    s = s[s.find('}'):len(s)]
+                    s = s[s.find('}'):]
             f.close()
         except:
             print('An error occurred while reading', self.mainTexFile)
@@ -87,7 +87,7 @@ class Styler:
         '''Extract main file path from main tex file
         '''
         print('... getting file path')
-        self.filePath = self.mainTexFile[0:self.mainTexFile.rfind('\\') + 1]
+        self.filePath = self.mainTexFile[:self.mainTexFile.rfind('\\') + 1]
 
     def GetMainTexFileCites(self):
         '''Search for cites in the project's main tex file
@@ -98,8 +98,8 @@ class Styler:
             s = f.read()  # read file to end
             # parse current file looking for \cite commands, and store all cite keys in an array in their order of appearance
             while s.find('\\cite{') != -1:
-                s = s[s.find('\\cite{')+len('\\cite{'):len(s)]
-                temp = s[0:s.find('}')]
+                s = s[s.find('\\cite{')+len('\\cite{'):]
+                temp = s[:s.find('}')]
                 # handle multiple keys inside single citation
                 cites = temp.split(',')
                 for c in cites:
@@ -124,8 +124,8 @@ class Styler:
                 s = f.read()  # read file to end
                 # parse current file looking for \cite commands, and store all cite keys in an array in their order of appearance
                 while s.find('\\cite{') != -1:
-                    s = s[s.find('\\cite{')+len('\\cite{'):len(s)]
-                    temp = s[0:s.find('}')]
+                    s = s[s.find('\\cite{')+len('\\cite{'):]
+                    temp = s[:s.find('}')]
                     # handle multiple keys inside single citation
                     cites = temp.split(',')
                     for c in cites:
@@ -149,11 +149,14 @@ class Styler:
                 s = binary.decode('latin-1')
             # parse bibliography file and store bibitems in a dictionary
             while s.find('\\bibitem') != -1:
-                s = s[s.find('\\bibitem')+len('\\bibitem'):len(s)]
+                s = s[s.find('\\bibitem')+len('\\bibitem'):]
                 if s.find('\\bibitem') != -1:  # this is any \bibitem
-                    bibitem = s[0:s.find('\\bibitem')]
+                    bibitem = s[:s.find('\\bibitem')]
                 else:  # this is the last \bibitem of the bibliography file
-                    bibitem = s[0:s.find('\\end{')]
+                    bibitem = s[:s.find('\\end{')]
+                if s.find('%\\cite{') != -1:
+                    # remove comment of form '%\cite{}' from future bibitem
+                    bibitem = bibitem[:s.find('%\\cite{')]
                 key = bibitem[1:bibitem.find('}')]  # get \bibitem key
                 bibitem = bibitem.replace('{' + key + '}', '')  # remove key from the \bibitem entry
                 bibitem = bibitem.strip()
@@ -178,26 +181,26 @@ class Styler:
             if self.bibStyle.PLAIN:  # same \bibitem order as the original bibliography file, but with specified preamble and postamble
                 print('\t\twriting \\bibitems PLAIN style')
                 for key in self.dBibitems:
-                    f.write('\t\\bibitem{'+ key +'} '+ self.dBibitems[key] +'\n\n')
+                    f.write('\\bibitem{'+ key +'} '+ self.dBibitems[key] +'\n\n')
 
             elif self.bibStyle.ALPHA:  # \bibitem entry alphabetical order
                 print('\t\twriting \\bibitems ALPHA style')
                 for key in sorted(self.dBibitems, key=self.dBibitems.get):
-                    f.write('\t\\bibitem{'+ key +'} '+ self.dBibitems[key] +'\n\n')
+                    f.write('\\bibitem{'+ key +'} '+ self.dBibitems[key] +'\n\n')
 
             elif self.bibStyle.UNSRT:  # \bibitem key order of appearance in the latex project files
                 print('\t\twriting \\bibitems UNSRT style')
                 for key in self.aCites:
-                    f.write('\t\\bibitem{' + key + '} ' + self.dBibitems[key] + '\n\n')
+                    f.write('\\bibitem{' + key + '} ' + self.dBibitems[key] + '\n\n')
                     del self.dBibitems[key]  # remove the \bibitem that we just wrote from the \bibitems array
                 # at this point, the \bibitems that were cited in the latex project files have been written in the output file
                 # we know proceed to write the \bibitems that were not cited in the latex project, in the same order they were read
                 for key in self.dBibitems:
-                    f.write('\t\\bibitem{' + key +'} '+ self.dBibitems[key] +'\n\n')
+                    f.write('\\bibitem{' + key +'} '+ self.dBibitems[key] +'\n\n')
             print('\t\twriting postamble')
             f.write('\n' + self.postamble)
         except:
-            print('An error has ocurred while writing the output bibliography file,',
+            print('An error has occurred while writing the output bibliography file,',
                   self.outputBibFile)
             raise
         else:
