@@ -207,15 +207,22 @@ class Styler:
                 # \bibitem key order of appearance in the latex project files
                 print('\t\twriting \\bibitems UNSRT style')
                 for key in self.aCites:
-                    f.write('\\bibitem{' + key + '} ' + self.dBibitems[key] + '\n\n')
-                    # remove the \bibitem that we just wrote from the \bibitems array
-                    del self.dBibitems[key]
+                    try:
+                        f.write('\\bibitem{' + key + '} ' + self.dBibitems[key] + '\n\n')
+                        # remove the \bibitem that we just wrote from the \bibitems array
+                        del self.dBibitems[key]
+                    except KeyError:
+                        print('KeyError: ' + key + ' not found in dBibitems')
                 # At this point, the \bibitems that were cited in the latex project files
                 # have been written in the output file.
-                # We now proceed to write the \bibitems that were not cited in the latex
-                # project, in the same order they were read.
-                for key in self.dBibitems:
-                    f.write('\\bibitem{' + key + '} ' + self.dBibitems[key] + '\n\n')
+                if self.dBibitems:  # there are still bibitems left that were not cited
+                    print('\n+ There are bibitems that were not cited in the latex '
+                          'project. \nDo you want to include them in the same order '
+                          'they were read? (y/N)')
+                    if input() == 'y':
+                        for key in self.dBibitems:
+                            f.write('\\bibitem{' + key + '} ' + self.dBibitems[key] +
+                                    '\n\n')
             print('\t\twriting postamble')
             f.write('\n' + self.postamble)
         except:
