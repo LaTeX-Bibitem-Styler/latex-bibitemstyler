@@ -1,6 +1,10 @@
 LaTeX Bibitem Styler
 ====================
 
+This program allows you to automatically sort `\bibitems` by citation order of alphabetically.
+
+### Description
+
 There's a major problem in LaTeX bibliography styling/sorting when not using BibTeX.
 
 When using BibTeX, one can specify a `\bibliographystyle`, but if we're generating our bibliography from plain `\bibitem` entries, using the `\thebibliography` command, there's no way of specifying the output style.
@@ -134,7 +138,10 @@ before
 
 >\end{document}
 
+### License
 
----------------------------------------
-Andreea Georgescu | Sílvia Mur | 2015
+Copyright 2015 Andreea Georgescu, Sílvia Mur
 
+Licensed under GNU GPL version 2 or any later version
+
+http://www.gnu.org/licenses/
