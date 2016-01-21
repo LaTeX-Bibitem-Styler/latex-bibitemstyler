@@ -1,7 +1,7 @@
 ###################################################################
 # LaTeX-BibitemsStyler
 #
-# Sílvia "PchiwaN" Mur Blanch
+# Silvia "PchiwaN" Mur Blanch
 # silvia.murblanch at gmail.com
 #
 # Andreea Georgescu
@@ -30,9 +30,17 @@ from collections import namedtuple, OrderedDict
 import os
 import sys
 
+# Check default encoding
+if (sys.stdout.encoding is None):            
+    print >> sys.stderr, "Please set python env PYTHONIOENCODING=UTF-8" 
+    exit(1)
+
+# Define input as raw_input for Python 2.x
+try: input = raw_input
+except NameError: pass
+
 bibstyles = namedtuple('bibstyles', ['PLAIN', 'ALPHA', 'UNSRT'])
 bibstyles.__new__.__defaults__ = tuple([False] * len(bibstyles._fields))
-
 
 class Styler:
     def __init__(self, mainTexFile='', bibFilename='', outputBibFile='', style_index=0):
@@ -153,9 +161,8 @@ class Styler:
         '''
         print('... getting \\bibitems')
         try:
-            with open(self.filePath + self.bibFilename, 'br') as f:
-                binary = f.read()  # read to end
-                s = binary.decode('latin-1')
+            with open(self.filePath + self.bibFilename, 'r') as f:
+                s = f.read()  # read to end
             # parse bibliography file and store bibitems in a dictionary
             while s.find('\\bibitem') != -1:
                 s = s[s.find('\\bibitem')+len('\\bibitem'):]
@@ -220,9 +227,9 @@ class Styler:
                           'project. \nDo you want to include them in the same order '
                           'they were read? (y/N)')
                     if input() == 'y':
-                        for key in self.dBibitems:
-                            f.write('\\bibitem{' + key + '} ' + self.dBibitems[key] +
-                                    '\n\n')
+                       for key in self.dBibitems:
+                           f.write('\\bibitem{' + key + '} ' + self.dBibitems[key] +
+                                   '\n\n')
             print('\t\twriting postamble')
             f.write('\n' + self.postamble)
         except:
@@ -255,24 +262,24 @@ class Styler:
             print('\n+ This is the default bibliography preamble\n\n', self.preamble)
             print('\n\n+ Do you want to change it? (y/N)')
             if input() == 'y':
-                print('\n+ Enter preamble (type \'\\q\' to submit)\n')
-                k = ''
-                self.preamble = ''
-                while k != '\q':
-                    k = input()
-                    if k != '\q':
-                        self.preamble += k
+               print('\n+ Enter preamble (type \'\\q\' to submit)\n')
+               k = ''
+               self.preamble = ''
+               while k != '\q':
+                   k = input()
+                   if k != '\q':
+                       self.preamble += k
 
             print('\n+ This is the default bibliography postamble\n\n', self.postamble)
             print('\n\n+ Do you want to change it? (y/N)')
             if input() == 'y':
-                print('\n+ Enter postamble (type \'\\q\' to submit)\n')
-                k = ''
-                self.postamble = ''
-                while k != '\q':
-                    k = input()
-                    if k != '\q':
-                        self.postamble += k
+               print('\n+ Enter postamble (type \'\\q\' to submit)\n')
+               k = ''
+               self.postamble = ''
+               while k != '\q':
+                   k = input()
+                   if k != '\q':
+                       self.postamble += k
 
             print('\n+ Bibliography style\n')
             if self.bibStyle.PLAIN:
