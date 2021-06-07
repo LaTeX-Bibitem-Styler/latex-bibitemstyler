@@ -1,7 +1,7 @@
 LaTeX Bibitem Styler
 ====================
 
-This program allows you to automatically sort `\bibitems` by citation order of alphabetically.
+This program allows you to automatically sort `\bibitems` by citation order or alphabetically.
 
 ### Description
 
